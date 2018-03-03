@@ -50,16 +50,101 @@ To see the basic generated app in action just run
 We will need the next libraries
 Name | Description
 ----- | -----------
-axios | Promise based HTTP client for the browser and node.js
-immutable | Immutable collections for JavaScript
 react | A declarative, efficient, and flexible JavaScript library for building user interfaces
 react-dom | This package serves as the entry point of the DOM-related rendering paths
 react-redux | Official React bindings for Redux
 react-scripts | Shiped with create react app
 redux | Redux is a predictable state container for JavaScript apps
 redux-thunk | Thunk middleware for Redux
+axios | Promise based HTTP client for the browser and node.js
+immutable | Immutable collections for JavaScript
 
 ### Install
 
 ```npm install --save redux react-redux redux-thunk axios immutable```
 
+## 03 Redux configuration
+
+Redux is composed by three basic concepts:
+
+### The Store
+Is where our app state will be allocated, the store will keep track of the state and supply it to our application when require it.
+
+```src/redux/store.js```
+```javascript
+import { createStore, applyMiddleware } from 'redux'
+import { combineReducers } from 'redux'
+import thunk from 'redux-thunk'
+import reducer from './reducer'
+
+export default createStore(reducer, applyMiddleware(thunk))
+```
+
+### Reducer/s
+The reducer is in charge of change the state after and actions is triggered.
+
+```src/redux/reducer.js```
+```javascript
+import Immutable from 'immutable'
+import * as constants from './constants'
+
+export default function reducer(state = Immutable.Map(), action) {
+  switch (action.type) {
+    default:
+      return state
+  }
+}
+```
+
+### Actions
+The actions will be call to trigger events, the actions supply the reducer with an action type and an action payload.
+
+```src/redux/actions.js```
+```javascript
+import * as constants from './constants'
+
+export function() {
+    return {
+        type: constants.ACION_NAME
+    }
+}
+```
+
+---
+
+More concepts
+
+### Constants
+Optionally you can use a set of STRING constants to represent action type names.
+
+```src/redux/contants.js```
+```javascript
+export const ACTION_NAME = 'ACTION_NAME'
+```
+
+
+### Provider
+
+This React component wraps our app and supplies the inner components with the store object.
+
+```javascript
+import { Provider } from 'react-redux'
+import store from './redux/store'
+
+<Provider store={store}>
+   ...Rest of compoenents
+</Provider>
+```
+
+---
+
+At the end you will end up with the next files hierarchy
+
+```
+- src
+ |_ redux
+   |_ actions.js
+   |_ constants.js
+   |_ reducer.js
+   |_ store.js 
+```
