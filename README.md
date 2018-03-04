@@ -148,3 +148,118 @@ At the end you will end up with the next files hierarchy
    |_ reducer.js
    |_ store.js 
 ```
+
+## 04 React components
+
+React creates a virtual DOM in memory which at the end will be rendered to the browser DOM as common DOM children tags, but while they are in memory will also have a reacty plus, by having a life cycle, properties and state.
+
+### Basic HTML components
+
+React can easily create components that will render common HTML tags into the browser DOM, they don't need any special configuration and can have any attribute their analogue HTML can have, except for the ```class``` attribute in React this should be written as ```className```.
+
+JSX example div:
+```javascript
+<div className="juts-a-div">Content</div>
+```
+
+This will render as:
+```html
+<div class="just-a-div">Content</div>
+```
+
+Let's take a look to our current App.js file.
+```javascript
+import React, { Component } from 'react';
+import { Provider } from 'react-redux'
+import store from './redux/store'
+import logo from './logo.svg';
+import './App.css';
+
+class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo" />
+            <h1 className="App-title">Welcome to React</h1>
+          </header>
+          <p className="App-intro">
+            To get started, edit <code>src/App.js</code> and save to reload.
+          </p>
+        </div>
+      </Provider>
+    );
+  }
+}
+
+export default App;
+```
+
+This will render as
+```html
+<div class="App">
+  <header class="App-header">
+    <img src="/static/media/logo.5d5d9eef.svg" class="App-logo" alt="logo">
+    <h1 class="App-title">Welcome to React</h1>
+  </header>
+  <p class="App-intro">
+    To get started, edit <code>src/App.js</code> and save to reload.
+  </p>
+</div>
+```
+
+As you can see the ```<Provider />``` component is not being rendered as a HTML, this is because only common HTML tags React components will be rendered into the browser DOM any other Component is just a wrapper with the logic needed to render the desired HTML.
+
+### Our first component
+
+Lets replace the boilerplate code inside our ```<App/>``` component with or own ```IndexPage``` component.
+
+```src/components/IndexPage.jsx```
+
+```javascript
+import React, { Component } from 'react';
+
+class IndexPage extends Component {
+  render() {
+    return (
+      <div className='index-page'>
+        This our brand new Page
+      </div>
+    );
+  }
+}
+
+export default IndexPage;
+```
+
+Then just require our new component in ```App.js``` and replace all the content for our own.
+
+```javascript
+import React, { Component } from 'react';
+import { Provider } from 'react-redux'
+import store from './redux/store'
+import IndexPage from './components/IndexPage'
+import logo from './logo.svg';
+import './App.css';
+
+class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <IndexPage />
+      </Provider>
+    );
+  }
+}
+
+export default App;
+```
+
+Now our app will render
+
+```html
+<div class="index-page">This our brand new Page</div>
+```
+
+Again neither ```<Provider />``` or ```<IndexPage />``` are being rendered as HTML tags but since ```IndexPage``` is rendering some common react components in its inside, they are being rendered to the browser DOM.
