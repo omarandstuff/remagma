@@ -9,7 +9,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <IndexPage />
+        <IndexPage title="Rick and Morty characters"/>
       </Provider>
     );
   }

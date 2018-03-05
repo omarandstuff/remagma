@@ -263,3 +263,107 @@ Now our app will render
 ```
 
 Again neither ```<Provider />``` or ```<IndexPage />``` are being rendered as HTML tags but since ```IndexPage``` is rendering some common react components in its inside, they are being rendered to the browser DOM.
+
+## 05 State and Properties
+
+The react components can have two different types of data sources, the properties and the state. The properties are data sent to them from the outside and the state is data managed by itself, when you change one of them the component will detect the change and will re-render it self to reflect the changes.
+
+### Props
+
+Every component can access an instance attribute called props (```this.props```), this will contain all the props passed from the outside to the component.
+
+Passing props to the component is as easy as setting attributes in a HTML tag.
+
+```javascript
+<Component prop1="value" magicProp={3} boolProp />
+```
+
+props can be strings ```"value"```, js expresions ```{3}``` or inplisit booleans ```boolProp```
+
+Lets pass some props to our ```IndexPage```
+
+```src/App.js```
+```javascript
+<IndexPage title="Rick and Morty characters"/>
+```
+
+now we can use the ```title``` prop in ```IndexPage```
+
+```src/components/IndexPage.js```
+```javascript
+class IndexPage extends Component {
+  render() {
+    return (
+      <div className='index-page'>
+        {this.props.title}
+      </div>
+    );
+  }
+}
+```
+
+This will render as
+
+```html
+<div class="index-page">Rick and Morty characters</div>
+```
+
+### State
+
+This one works a little different from the props attribute, ```this.state``` contains values you know will change and will be produced inside by our component.
+
+To change our state we use the method ```setState()``` every time we need to trigger a new render so the final render reflects this state change.
+
+let's decalre a new initial state in our ```IndexPage``` and render one of its members
+
+```javascript
+class IndexPage extends Component {
+  state = { numberOfCharacters: 0 }
+
+  render() {
+    return (
+      <div className='index-page'>
+        {this.props.title}: {this.state.numberOfCharacters}
+      </div>
+    );
+  }
+}
+```
+
+this will render as
+```html
+<div class="index-page">Rick and Morty characters: 0</div>
+```
+
+now to trigger a state change lets add a ```<button>``` that will change ```numberOfCharacters``` every time we press it.
+
+```javascript
+class IndexPage extends Component {
+  state = { numberOfCharacters: 0 }
+
+  addCharacter = () => {
+    const newValue = this.state.numberOfCharacters + 1
+
+    this.setState({ numberOfCharacters: newValue })
+  }
+
+  render() {
+    return (
+      <div className='index-page'>
+        {this.props.title}: {this.state.numberOfCharacters}
+        <button onClick={this.addCharacter}>Add character</button>
+      </div>
+    );
+  }
+}
+```
+
+this will render as:
+```html 
+<div class="index-page">
+  Rick and Morty characters: 0
+  <button>Add character</button>
+</div>
+```
+
+the button now have a function binded to the ```onClick``` event.
