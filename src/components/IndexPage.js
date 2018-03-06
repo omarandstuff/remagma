@@ -1,22 +1,43 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as actions from '../redux/actions'
 
 class IndexPage extends Component {
   state = { numberOfCharacters: 0 }
 
-  addCharacter = () => {
-    const newValue = this.state.numberOfCharacters + 1
-
-    this.setState({ numberOfCharacters: newValue })
+  componentWillMount() {
+    this.props.loadCharacters()
   }
 
   render() {
+    const characters = this.props.characters.map(character => {
+      return <li key={character.id}>{character.name}</li>
+    })
+
     return (
       <div className='index-page'>
-        {this.props.title}: {this.state.numberOfCharacters}
-        <button onClick={this.addCharacter}>Add character</button>
+        {this.props.title}: {this.props.characters.length}
+        <ul>
+          {characters}
+        </ul>
       </div>
     );
   }
 }
 
-export default IndexPage;
+function mapStateToProps(state) {
+  return {
+    characters: state.get('characters') || []
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCharacters: () => {
+      dispatch(actions.loadCharacters())
+    }
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)

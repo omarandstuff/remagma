@@ -48,6 +48,7 @@ To see the basic generated app in action just run
 ## 02 Dependencies
 
 We will need the next libraries
+
 Name | Description
 ----- | -----------
 react | A declarative, efficient, and flexible JavaScript library for building user interfaces
@@ -366,4 +367,107 @@ this will render as:
 </div>
 ```
 
-the button now have a function binded to the ```onClick``` event.
+the button now has a function binded to the ```onClick``` event.
+
+## 06 Interact with the Redux state
+
+To start populating our ```Redux``` state we need to trigger and action and then use our action payload in the reducer to change the current state, once changed the ```<Provider>``` will, well, provide our app with the new state.
+
+### Load characters action
+
+Let's create our first action ```loadCharacters```
+
+```src/redux/constants.js```
+```javascript
+export const LOAD_CHARACTERS = 'LOAD_CHARACTERS'
+```
+
+```src/redux/actions.js```
+```javascript
+import * as constants from './constants'
+
+export function loadCharacters() {
+  return {
+    type: constants.LOAD_CHARACTERS,
+    characters: [
+      { id: 1, name: 'Rick' },
+      { id: 2, name: 'Morty' },
+      { id: 3, name: 'Llamas' }
+    ]
+  }
+}
+```
+
+Here we create a new function (action) that returns an action descriptor of type ```LOAD_CHARACTERS``` and with a payload called characters which contains an array of characters.
+
+When dispatching this action, the reducer will decide what to do with the action descriptor that the action provided.
+
+```src/redux/reducer.js```
+```javascript
+import Immutable from 'immutable'
+import * as constants from './constants'
+
+export default function reducer(state = Immutable.Map(), action) {
+  switch (action.type) {
+    case constants.LOAD_CHARACTERS:
+      return state.set('characters', action.characters)
+    default:
+      return state
+  }
+}
+
+```
+
+Here the reducer set the attribute ```characters``` as the array of characters from the action payload.
+
+### Connect components with Redux
+
+Now that our Redux state is populated ```{ characters: [] }```.
+
+To give Redux capabilities to our components, such as dispatch an action or access the state, we need to ```connect``` our component.
+
+```javascript
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as actions from '../redux/actions'
+
+class IndexPage extends Component {
+  state = { numberOfCharacters: 0 }
+
+  componentWillMount() {
+    this.props.loadCharacters()
+  }
+
+  render() {
+    const characters = this.props.characters.map(character => {
+      return <li key={character.id}>{character.name}</li>
+    })
+
+    return (
+      <div className='index-page'>
+        {this.props.title}: {this.props.characters.length}
+        <ul>
+          {characters}
+        </ul>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    characters: state.get('characters') || []
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCharacters: () => {
+      dispatch(actions.loadCharacters())
+    }
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)
+```

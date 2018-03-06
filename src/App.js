@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux'
 import store from './redux/store'
 import IndexPage from './components/IndexPage'
-import logo from './logo.svg';
-import './App.css';
 
 class App extends Component {
   render() {

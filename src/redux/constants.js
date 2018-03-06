@@ -1,0 +1,1 @@
+export const LOAD_CHARACTERS = 'LOAD_CHARACTERS'
