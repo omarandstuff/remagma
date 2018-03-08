@@ -1,68 +1,52 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../redux/actions'
+import Header from './Header'
+import CharacterList from './CharacterList'
+import CharacterPreview from './CharacterPreview'
+import Pager from './Pager'
+
+import './IndexPage.css'
 
 class IndexPage extends Component {
-  state = { page: 1, previousDisabled: true, nextDisabled: true }
+  state = { selected: null }
 
   componentWillMount() {
     this.props.loadCharacters()
   }
 
-  componentWillReceiveProps(nextProps) {
-    const nextDisabled = nextProps.pages === this.state.page
-
-    this.setState({ nextDisabled })
-  }
-
-  goToPreviousPage = () => {
-    const page = this.state.page - 1
-
-    this.goToPage(page)
-  }
-
-  goToNextPage = () => {
-    const page = this.state.page + 1
-
-    this.goToPage(page)
-  }
-
   goToPage = (page) => {
-    const previousDisabled = page === 1
-    const nextDisabled = this.props.pages === page
-
     this.props.loadCharacters(page)
-    this.setState({ page, previousDisabled, nextDisabled })
+  }
+
+  onSelect = (character) => {
+    this.setState({
+      selected: character.id
+    })
   }
 
   render() {
-    const characters = this.props.characters.map(character => {
-      return <li key={character.id}>{character.name}</li>
+    const selectedCharacter = this.props.characters.find(character => {
+      return character.id === this.state.selected
     })
 
     return (
-      <div className='index-page'>
-        {this.props.title}: {this.props.count}
-        <ul>
-          {characters}
-        </ul>
-        <div>
-          <button
-            disabled={this.state.previousDisabled}
-            onClick={this.goToPreviousPage}
-          >
-            Previous
-          </button>
-          {this.state.page}
-          <button
-            disabled={this.state.nextDisabled}
-            onClick={this.goToNextPage}
-          >
-            Next
-          </button>
+      <div className="index-page">
+        <Header count={this.props.count} />
+        <Pager
+          total={this.props.pages}
+          onChange={this.goToPage}
+        />
+        <div className="index-characters">
+          <CharacterList
+            characters={this.props.characters}
+            selected={this.state.selected}
+            onSelect={this.onSelect}
+          />
+          <CharacterPreview character={selectedCharacter} />
         </div>
       </div>
-    );
+    )
   }
 }
 

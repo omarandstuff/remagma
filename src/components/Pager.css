@@ -1,0 +1,21 @@
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.pager > button {
+  padding: 5px;
+  margin: 5px;
+  background-color: #00b0c8;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.pager > button:hover {
+  background-color: #0093a7;
+}

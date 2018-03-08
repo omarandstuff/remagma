@@ -1,0 +1,7 @@
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #00b0c8;
+  border-radius: 8px;
+  overflow: hidden;
+}

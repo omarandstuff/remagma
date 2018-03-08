@@ -502,10 +502,10 @@ The endpoint is going to be https://rickandmortyapi.com/api/character?page=numbe
         "name": String,
         "url": String
       },
-        "image": String,
-        "episode": [String],
-        "url": String,
-        "created": String
+      "image": String,
+      "episode": [String],
+      "url": String,
+      "created": String
       }
   ]
 }
@@ -696,3 +696,375 @@ export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)
 ```
 
 Now we can list all characters navigating through the pages.
+
+## 08 Styling
+
+Now that we have actual characters data and we can retrieved as we wish, we can focus on building our interface with React (Finally), we are going to create a couple of components additionally to the ```IndexPage``` one and apply some css to our page so it can look pretty.
+
+Let's begin...
+
+Lets Start building the page header as component
+
+```src/components/Header.js```
+```javascript
+import React, { Component } from 'react'
+
+import logo from './assets/logo.png'
+import './Header.css'
+
+export default class Header extends Component {
+  render() {
+    return (
+      <div className="main-header">
+        <div className="api-reference">
+          Using
+          <a href="https://rickandmortyapi.com/" target="blank"> The Rick and Morty API </a>
+          by
+          <a href="https://axelfuhrmann.com/" target="blank"> Axel Fuhrmann.</a>
+        </div>
+        <img src={logo} alt="Rick and Morty" />
+        <div className="header-bar">
+          <h2>
+            Character list
+          </h2>
+          <h4>
+            Total: {this.props.count}
+          </h4>
+        </div>
+      </div>
+    )
+  }
+}
+```
+
+```src/components/Header.css```
+```css
+.main-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #e7e7e7;
+}
+
+.main-header > .api-reference {
+  align-self: flex-end;
+  padding: 5px 10px 0 0;
+}
+
+.api-reference > a {
+  text-decoration: none;
+  color: #00b0c8;
+}
+
+.main-header > img {
+  max-height: 100px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.main-header > .header-bar {
+  width: 100%;
+  text-align: center;
+  background-color: #e2e2e2;
+  color: #00b0c8;
+}
+
+.header-bar > h2,h4 {
+  margin: 2px 0 2px 0;
+  padding: 0;
+}
+```
+
+we can now use it as
+
+```javascript
+<Header />
+```
+
+Now lets create a component for our character listing
+
+```src/components/CharacterList.js```
+```javascript
+import React, { Component } from 'react'
+import CharacterItem from './CharacterItem'
+import './CharacterList.css'
+
+export default class CharacterList extends Component {
+  render() {
+    const characters = this.props.characters.map(character => {
+      return <CharacterItem
+        key={character.id}
+        character={character}
+        onClick={this.props.onSelect}
+        selected={character.id === this.props.selected}
+      />
+    })
+
+    return (
+      <div className="character-list">
+        {characters}
+      </div>
+    )
+  }
+}
+```
+
+```src/components/CharacterList.css```
+```css
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #00b0c8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+```
+
+Which depends on a CharacterItem component
+
+```src/components/CharacterItem.js```
+```javascript
+import React, { Component } from 'react'
+import './CharacterItem.css'
+
+export default class CharacterItem extends Component {
+  onClick = () => {
+    if(this.props.onClick) {
+      this.props.onClick(this.props.character)
+    }
+  }
+
+  render() {
+    const character = this.props.character
+    const className = this.props.selected ? 'character-item selected' : 'character-item'
+
+    return (
+      <div key={character.id} className={className} onClick={this.onClick} >
+        <img src={character.image} alt={character.name} />
+        <div className="character-description">
+          <h4>{character.name}</h4>
+          <p>{character.species}</p>
+        </div>
+      </div>
+    )
+  }
+}
+```
+
+```src/components/CharacterItem.css```
+```css
+.character-list > .character-item {
+  width: calc(50% - 10px);
+  display: flex;
+  background-color: #f3f3f3;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.character-list > .character-item:hover, .character-list > .character-item.selected {
+  background-color: #00b0c8;
+}
+
+.character-item > img {
+  height: 50px;
+  border-radius: 8px;
+}
+
+.character-item > .character-description {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px;
+  color: #292929;
+}
+.character-item:hover > .character-description, .character-item.selected > .character-description {
+  color: white;
+}
+
+.character-description > h4, p {
+  margin: 2px;
+  padding: 0;
+}
+```
+
+we can now use it as
+
+```javascript
+<CharacterList />
+```
+
+Let's also create an independent component for the pagination
+
+```src/components/IndexPage.js```
+```javascript
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as actions from '../redux/actions'
+import Header from './Header'
+import CharacterList from './CharacterList'
+import CharacterPreview from './CharacterPreview'
+import Pager from './Pager'
+
+import './IndexPage.css'
+
+class IndexPage extends Component {
+  state = { selected: null }
+
+  componentWillMount() {
+    this.props.loadCharacters()
+  }
+
+  goToPage = (page) => {
+    this.props.loadCharacters(page)
+  }
+
+  onSelect = (character) => {
+    this.setState({
+      selected: character.id
+    })
+  }
+
+  render() {
+    const selectedCharacter = this.props.characters.find(character => {
+      return character.id === this.state.selected
+    })
+
+    return (
+      <div className="index-page">
+        <Header count={this.props.count} />
+        <Pager
+          total={this.props.pages}
+          onChange={this.goToPage}
+        />
+        <div className="index-characters">
+          <CharacterList
+            characters={this.props.characters}
+            selected={this.state.selected}
+            onSelect={this.onSelect}
+          />
+          <CharacterPreview character={selectedCharacter} />
+        </div>
+      </div>
+    )
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    characters: state.get('characters') || [],
+    count: state.get('count') || 0,
+    pages: state.get('pages') || 0
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCharacters: (page) => {
+      dispatch(actions.loadCharacters(page))
+    }
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)
+```
+
+```src/components/Pager.css```
+```css
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.pager > button {
+  padding: 5px;
+  margin: 5px;
+  background-color: #00b0c8;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.pager > button:hover {
+  background-color: #0093a7;
+}
+```
+
+Let's use this new components in our ```IndexPage```
+
+```src/components/Pager.js```
+```javascript
+import React, { Component } from 'react'
+import './Pager.css'
+
+export default class Pager extends Component {
+  state = {
+    page: 1,
+    previousDisabled: true,
+    nextDisabled: true
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const nextDisabled = nextProps.total === this.state.page
+
+    this.setState({ nextDisabled })
+  }
+
+  goToPreviousPage = () => {
+    const page = this.state.page - 1
+
+    this.goToPage(page)
+  }
+
+  goToNextPage = () => {
+    const page = this.state.page + 1
+
+    this.goToPage(page)
+  }
+
+  goToPage = (page) => {
+    const previousDisabled = page === 1
+    const nextDisabled = this.props.pages === page
+
+    this.setState({ page, previousDisabled, nextDisabled })
+
+    if(this.props.onChange) {
+      this.props.onChange(page)
+    }
+  }
+
+  render() {
+    return (
+      <div className="pager">
+        <button
+          disabled={this.state.previousDisabled}
+          onClick={this.goToPreviousPage}
+        >
+          Previous
+        </button>
+        {this.state.page}/{this.props.total}
+        <button
+          disabled={this.state.nextDisabled}
+          onClick={this.goToNextPage}
+        >
+          Next
+        </button>
+      </div>
+    )
+  }
+}
+```
+
+```src/components/IndexPage.css```
+```css
+.index-characters {
+  display: flex;
+  padding: 10px;
+}
+```
+
+That's it we have finished our example App.

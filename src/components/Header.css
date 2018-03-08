@@ -1,0 +1,34 @@
+.main-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #e7e7e7;
+}
+
+.main-header > .api-reference {
+  align-self: flex-end;
+  padding: 5px 10px 0 0;
+}
+
+.api-reference > a {
+  text-decoration: none;
+  color: #00b0c8;
+}
+
+.main-header > img {
+  max-height: 100px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.main-header > .header-bar {
+  width: 100%;
+  text-align: center;
+  background-color: #e2e2e2;
+  color: #00b0c8;
+}
+
+.header-bar > h2,h4 {
+  margin: 2px 0 2px 0;
+  padding: 0;
+}

@@ -1,0 +1,20 @@
+.character-preview {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #00b0c8;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: 10px;
+  padding: 10px;
+  background-color: #f3f3f3;
+}
+
+.character-preview > img {
+  border-radius: 16px;
+  max-width: 360px;
+}
+
+.character-preview > .charcter-field {
+  display: flex;
+}

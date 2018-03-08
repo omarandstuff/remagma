@@ -1,0 +1,32 @@
+.character-list > .character-item {
+  width: calc(50% - 10px);
+  display: flex;
+  background-color: #f3f3f3;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.character-list > .character-item:hover, .character-list > .character-item.selected {
+  background-color: #00b0c8;
+}
+
+.character-item > img {
+  height: 50px;
+  border-radius: 8px;
+}
+
+.character-item > .character-description {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px;
+  color: #292929;
+}
+.character-item:hover > .character-description, .character-item.selected > .character-description {
+  color: white;
+}
+
+.character-description > h4, p {
+  margin: 2px;
+  padding: 0;
+}
