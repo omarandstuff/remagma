@@ -1068,3 +1068,7 @@ export default class Pager extends Component {
 ```
 
 That's it we have finished our example App.
+
+## 09 Wrapping all up
+
+So our app is finished, it make use of ```Redux``` to manage our app state and also act as a data repository, we used ```React``` to present that data to the user in an easy to use and visual way, we also learn how to retrieve information from a remote source and how to build components to encapsulate logic where it belongs.
