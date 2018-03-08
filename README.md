@@ -1072,3 +1072,7 @@ That's it we have finished our example App.
 ## 09 Wrapping all up
 
 So our app is finished, it make use of ```Redux``` to manage our app state and also act as a data repository, we used ```React``` to present that data to the user in an easy to use and visual way, we also learn how to retrieve information from a remote source and how to build components to encapsulate logic where it belongs.
+
+
+## 10 Conclusion
+We know now how to rapidly build a React App from scratch using the ```create-react-app``` library and we have a basic understanding how to use ```React``` and ```Redux```, that's good news, but we also need to learn a lot more about how to create quality code for our application, so from now on some concepts I recommend to research for are re React ```PropTypes```, the ```jest``` test library or any other one toy feel comfortable with and the ```enzyme``` library to test our components directly.
