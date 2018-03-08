@@ -471,3 +471,228 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)
 ```
+
+## 07 Retrieving data from API
+
+Now let's get some real characters form the public API https://rickandmortyapi.com to retrieve some data.
+
+The endpoint is going to be https://rickandmortyapi.com/api/character?page=number_of_page, which is going to send data in the next format:
+
+```json
+{
+  "info": {
+    "count": Number,
+    "pages": Number,
+    "next": String,
+    "prev": String
+  },
+  "results": [
+    {
+      "id": Number,
+      "name": String,
+      "status": String,
+      "species": String,
+      "type": String,
+      "gender": String,
+      "origin": {
+        "name": String,
+        "url": String
+      },
+      "location": {
+        "name": String,
+        "url": String
+      },
+        "image": String,
+        "episode": [String],
+        "url": String,
+        "created": String
+      }
+  ]
+}
+```
+### Async actions
+
+Right now, our current action ```LOAD_CHARACTERS``` is a sync action, in other words the app will be blocked until the action finish to be dispatched.
+
+We are using ```axios``` which is a promise based HTTP client for the browser and node.js :sunglasses:.
+
+We have a problem...
+
+```src/redux/actions.js```
+```javascript
+import * as constants from './constants'
+import axios from 'axios'
+
+export function loadCharacters(page = 1) {
+  axios.get(`https://rickandmortyapi.com/api/character?page=${page}`)
+  .then(function (response) {
+    // By the time this happens the action already finished.
+    console.log(response)
+  })
+  return {
+    type: constants.LOAD_CHARACTERS,
+    characters: [
+      { id: 1, name: 'Rick' },
+      { id: 2, name: 'Morty' },
+      { id: 3, name: 'Llamas' }
+    ]
+  }
+}
+```
+
+This won't work because the action is synchronous and by the time the asynchronous request finish, well nothing will be able to access the response. So another way is using await which will not work either because the action function is not declared as async.
+
+The solution is to make the action an asynchronous action but not in the traditional way but in a redux-thunk way by returning a function instead of an object descriptor, this function will be called passing the ```dispatch``` redux function that we will use to dispatch a secondary action that will actually populate the state with the retrieved data.
+
+```src/redux/actions.js```
+```javascript
+import * as constants from './constants'
+import axios from 'axios'
+
+export function loadCharacters(page = 1) {
+  return dispatch => {
+    axios.get(`https://rickandmortyapi.com/api/character?page=${page}`)
+    .then(function (response) {
+      const characters = response.data.results
+      const pages = response.data.info.pages
+      const count = response.data.info.count
+
+      dispatch(populateCharacters(characters, count, pages))
+    })
+  }
+}
+
+function populateCharacters(characters, count, pages) {
+  return {
+    type: constants.POPULATE_CHARACTERS,
+    characters,
+    count,
+    pages
+  }
+}
+```
+
+This way once we have the retrieved data we can populate the redux state.
+
+Let's change our constant name
+
+```src/redux/constants.js```
+```javascript
+export const POPULATE_CHARACTERS = 'POPULATE_CHARACTERS'
+```
+
+And our reducer to set the pages and total count
+
+```src/redux/reducer.js```
+```javascript
+import * as constants from './constants'
+
+export default function reducer(state = Immutable.Map(), action) {
+  switch (action.type) {
+    case constants.POPULATE_CHARACTERS:
+      return state.set('characters', action.characters)
+                  .set('count', action.count)
+                  .set('pages', action.pages)
+    default:
+      return state
+  }
+}
+```
+
+Now or index page should be showing more that 3 characters
+
+### Change page
+
+Our API returns only 20 characters at a time, so we need to call our new action for the page we need, let's build some page buttons.
+
+```src/components/IndexPage.js```
+```javascript
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as actions from '../redux/actions'
+
+class IndexPage extends Component {
+  state = { page: 1, previousDisabled: true, nextDisabled: true }
+
+  componentWillMount() {
+    this.props.loadCharacters()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const nextDisabled = nextProps.pages === this.state.page
+
+    this.setState({ nextDisabled })
+  }
+
+  goToPreviousPage = () => {
+    const page = this.state.page - 1
+
+    this.goToPage(page)
+  }
+
+  goToNextPage = () => {
+    const page = this.state.page + 1
+
+    this.goToPage(page)
+  }
+
+  goToPage = (page) => {
+    const previousDisabled = page === 1
+    const nextDisabled = this.props.pages === page
+
+    this.props.loadCharacters(page)
+    this.setState({ page, previousDisabled, nextDisabled })
+  }
+
+  render() {
+    const characters = this.props.characters.map(character => {
+      return <li key={character.id}>{character.name}</li>
+    })
+
+    return (
+      <div className='index-page'>
+        {this.props.title}: {this.props.count}
+        <ul>
+          {characters}
+        </ul>
+        <div>
+          <button
+            disabled={this.state.previousDisabled}
+            onClick={this.goToPreviousPage}
+          >
+            Previous
+          </button>
+          {this.state.page}
+          <button
+            disabled={this.state.nextDisabled}
+            onClick={this.goToNextPage}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    characters: state.get('characters') || [],
+    count: state.get('count') || 0,
+    pages: state.get('pages') || 0
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCharacters: (page) => {
+      dispatch(actions.loadCharacters(page))
+    }
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndexPage)
+```
+
+Now we can list all characters navigating through the pages.
