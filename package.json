@@ -17,5 +17,10 @@
     "react-scripts": "1.1.1",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "simple-deployer": "^0.1.8"
   }
 }
